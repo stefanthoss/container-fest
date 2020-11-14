@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  home-assistant:
+    image: homeassistant/home-assistant:0.117.6
+    container_name: home-assistant
+    restart: unless-stopped
+    ports:
+      - 8123:8123
+    volumes:
+      - ./config:/config
+    environment:
+      - TZ=America/Los_Angeles
