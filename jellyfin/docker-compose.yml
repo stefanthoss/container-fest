@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - 8096:8096
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - music:/mnt/music
+      - videos:/mnt/videos
+
+volumes:
+  videos:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.4,nolock,ro,soft,nfsvers=4"
+      device: ":/path/to/video-dir"
+  music:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.4,nolock,ro,soft,nfsvers=4"
+      device: ":/path/to/music-dir"
