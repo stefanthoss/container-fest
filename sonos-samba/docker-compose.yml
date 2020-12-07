@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  sonos-samba:
+    image: dperson/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    command: '-g "ntlm auth = yes" -g "server min protocol = NT1" -S -s "Music;/mnt/music;yes;yes"'
+    ports:
+      - 139:139
+      - 445:445
+    environment:
+      - TZ=PST8PDT
+    volumes:
+      - music:/mnt/music
+
+volumes:
+  music:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.1.4,nolock,ro,soft,nfsvers=4"
+      device: ":/path/to/music-dir"
