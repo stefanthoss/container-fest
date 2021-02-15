@@ -11,7 +11,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Los_Angeles
-      - URL=internal.example.com
+      - URL=example.com
       - SUBDOMAINS=docker
       - VALIDATION=dns
       - DNSPLUGIN=cloudflare
