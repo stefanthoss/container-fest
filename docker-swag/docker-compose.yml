@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  swag:
+    image: ghcr.io/linuxserver/swag:latest
+    container_name: swag
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - URL=internal.example.com
+      - SUBDOMAINS=docker
+      - VALIDATION=dns
+      - DNSPLUGIN=cloudflare
+      - ONLY_SUBDOMAINS=true
