@@ -25,6 +25,12 @@ docker-swag/config/etc/letsencrypt/live/docker.example.com/
 └── README
 ```
 
+## Grafana
+
+URL: <https://docker.example.com:3000/>
+
+A monitoring and visualization platform.
+
 ## Heimdall
 
 URL: <https://docker.example.com/>

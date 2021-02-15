@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+      - ../docker-swag/config/etc:/le-ssl:ro
+    # https://grafana.com/docs/grafana/latest/administration/configuration/#configure-with-environment-variables
+    environment:
+      - GF_SERVER_PROTOCOL=https
+      - GF_SERVER_CERT_FILE=/le-ssl/letsencrypt/live/docker.example.com/cert.pem
+      - GF_SERVER_CERT_KEY=/le-ssl/letsencrypt/live/docker.example.com/privkey.pem
