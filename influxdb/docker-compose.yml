@@ -15,3 +15,5 @@ services:
       - "--reporting-disabled"
       - "--tls-cert=/le-ssl/letsencrypt/live/docker.example.com/cert.pem"
       - "--tls-key=/le-ssl/letsencrypt/live/docker.example.com/privkey.pem"
+    healthcheck:
+      test: ["CMD", "influx", "ping", "--host", "https://localhost:8086", "--skip-verify"]
