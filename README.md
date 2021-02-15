@@ -43,6 +43,12 @@ URL: <http://docker.example.com:8123/>
 
 A home automation system. Change the environment variable `TZ` to your local timezone.
 
+## InfluxDB
+
+URL: <https://docker.example.com:8086/>
+
+A time series database to store metrics and sensor data. The data can be visualized with Grafana.
+
 ## Jellyfin
 
 URL: <http://docker.example.com:8096/>

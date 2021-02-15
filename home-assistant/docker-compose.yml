@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     ports:
       - 8123:8123
-    environment:
-      - TZ=America/Los_Angeles
     volumes:
       - ./config:/config
+    environment:
+      - TZ=America/Los_Angeles
