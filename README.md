@@ -8,6 +8,14 @@ URL: <http://docker.example.com:8000/>
 
 A website archiving service. Change the environment variable `SEARCH_BACKEND_PASSWORD` (for both the `archivebox` and the `sonic` service) to a random password.
 
+## Collabora
+
+URL: <https://docker.example.com:9980/>
+
+Admin URL: <https://docker.example.com:9980/loleaflet/dist/admin/admin.html>
+
+An online office suite that can be [integrated with Nextcloud](https://nextcloud.com/collaboraonline/). Change the `domain` environment variable to point to your Nextcloud instance (use double backslashs before the dots). Change `dictionaries` to the list of languages you want to support (two letter language and country codes). `username` and `password` are used to protect the admin console.
+
 ## Docker Swag
 
 An Nginx reverse proxy that is used to generate and renew SSL certificates via Let's Encrypt. Change the environment variables `SUBDOMAINS` and `URL`. Check out the [documentation](https://github.com/linuxserver/docker-swag) for details on how to configure the Certbot validation method. The file in this repo uses DNS validation via Cloudflare. Change the environment variable `TZ` to your local timezone.

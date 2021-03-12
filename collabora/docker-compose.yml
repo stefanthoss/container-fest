@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  collabora:
+    image: collabora/code:latest
+    container_name: collabora
+    restart: unless-stopped
+    ports:
+      - "9980:9980"
+    environment:
+      - "domain=nextcloud\\.example\\.com"
+      - "server_name=docker.example.com:9980"
+      - "dictionaries=en_US de_DE"
+      - "username=admin"
+      - "password=admin"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
