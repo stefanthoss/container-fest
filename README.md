@@ -78,3 +78,9 @@ A Docker management UI, useful for debugging and monitoring.
 ## Sonos Samba
 
 A Samba server that mounts a NFS share and exposes it read-only via the SMBv1 protocol. SMBv1 is outdated and insecure but unfortunately the only version of Samba that Sonos supports. Your main Samba server should have SMBv1 disabled and this Docker container can be used as a workaround for Sonos. Change the `volumes` section according to your own NFS share and change the environment variable `TZ` to your local timezone.
+
+## Tautulli
+
+URL: <http://docker.example.com:8181/>
+
+A web application for monitoring, collecting statistics, and analyzing usage of a Plex Media Server.
