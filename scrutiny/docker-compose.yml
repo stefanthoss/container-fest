@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  scrutiny:
+    image: analogj/scrutiny:web
+    container_name: scrutiny-web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: "curl -f -s http://localhost:8080/web/dashboard"
+    volumes:
+      - ./config:/scrutiny/config
+    environment:
+      - GIN_MODE=release

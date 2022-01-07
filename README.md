@@ -75,6 +75,12 @@ URL: <https://docker.example.com:9000/>
 
 A Docker management UI, useful for debugging and monitoring.
 
+## Scrutiny
+
+URL: <http://docker.example.com:8080/>
+
+A web UI for SMART monitoring of hard drives and SSDs. Needs a collector agent to collect the SMART data.
+
 ## Sonos Samba
 
 A Samba server that mounts a NFS share and exposes it read-only via the SMBv1 protocol. SMBv1 is outdated and insecure but unfortunately the only version of Samba that Sonos supports. Your main Samba server should have SMBv1 disabled and this Docker container can be used as a workaround for Sonos. Change the `volumes` section according to your own NFS share and change the environment variable `TZ` to your local timezone.
