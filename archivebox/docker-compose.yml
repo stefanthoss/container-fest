@@ -7,8 +7,9 @@ services:
     restart: unless-stopped
     command: server 0.0.0.0:8000
     ports:
-      - 8000:8000
+      - "8000:8000"
     environment:
+      - ALLOWED_HOSTS=*
       - SEARCH_BACKEND_ENGINE=sonic
       - SEARCH_BACKEND_HOST_NAME=sonic
       - SEARCH_BACKEND_PASSWORD=secretpassword
@@ -18,13 +19,13 @@ services:
       - sonic
 
   sonic:
-    image: valeriansaliou/sonic:v1.3.0
-    container_name: sonic
+    image: valeriansaliou/sonic:v1.3.2
+    container_name: archivebox-sonic
     restart: unless-stopped
     ports:
-      - 1491:1491
+      - "1491:1491"
     environment:
       - SEARCH_BACKEND_PASSWORD=secretpassword
     volumes:
-      - ./etc/sonic/config.cfg:/etc/sonic.cfg
-      - ./data:/var/lib/sonic/store/
+      - ./sonic.cfg:/etc/sonic.cfg:ro
+      - ./data/sonic:/var/lib/sonic/store

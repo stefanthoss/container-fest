@@ -7,6 +7,8 @@ services:
     restart: unless-stopped
     ports:
       - "9980:9980"
+    healthcheck:
+      test: "curl -f -k -s https://localhost:9980 | grep -e 'OK'"
     environment:
       - "domain=nextcloud\\.example\\.com"
       - "server_name=docker.example.com:9980"

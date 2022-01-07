@@ -2,17 +2,18 @@ version: "3"
 
 services:
   influxdb:
-    image: quay.io/influxdb/influxdb:v2.0.4
+    image: influxdb:2.0.8
     container_name: influxdb
     restart: unless-stopped
     volumes:
-      - ./influxdbv2:/root/.influxdbv2
+      - ./influxdbv2:/var/lib/influxdb2
       - ../docker-swag/config/etc:/le-ssl:ro
     ports:
-      - 8086:8086
+      - "8086:8086"
     environment:
       - INFLUXD_TLS_CERT=/le-ssl/letsencrypt/live/docker.example.com/cert.pem
       - INFLUXD_TLS_KEY=/le-ssl/letsencrypt/live/docker.example.com/privkey.pem
       - INFLUXD_REPORTING_DISABLED=true
+      - INFLUXD_TLS_MIN_VERSION=1.1
     healthcheck:
       test: ["CMD", "influx", "ping", "--host", "https://localhost:8086", "--skip-verify"]
