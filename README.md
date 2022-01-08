@@ -63,6 +63,12 @@ URL: <http://docker.example.com:8096/>
 
 A media server for music and videos. This service mounts two NFS shares to `/mnt/music` and `/mnt/videos`. Change the `volumes` section according to your own NFS shares.
 
+## LibreSpeed
+
+URL: <http://docker.example.com:8010/>
+
+A self-hosted speedtest website for your local network.
+
 ## Netdata
 
 URL: <http://docker.example.com:19999/>
