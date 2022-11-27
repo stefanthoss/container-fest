@@ -2,18 +2,28 @@ version: "3"
 
 services:
   influxdb:
-    image: influxdb:2.0.8
+    image: influxdb:2.1.1
     container_name: influxdb
     restart: unless-stopped
     volumes:
       - ./influxdbv2:/var/lib/influxdb2
-      - ../docker-swag/config/etc:/le-ssl:ro
-    ports:
-      - "8086:8086"
-    environment:
-      - INFLUXD_TLS_CERT=/le-ssl/letsencrypt/live/docker.example.com/cert.pem
-      - INFLUXD_TLS_KEY=/le-ssl/letsencrypt/live/docker.example.com/privkey.pem
-      - INFLUXD_REPORTING_DISABLED=true
-      - INFLUXD_TLS_MIN_VERSION=1.1
     healthcheck:
-      test: ["CMD", "influx", "ping", "--host", "https://localhost:8086", "--skip-verify"]
+      test: ["CMD", "influx", "ping", "--host", "http://localhost:8086"]
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.influxdb.entrypoints=http"
+      - "traefik.http.routers.influxdb.rule=Host(`influxdb.example.com`)"
+      - "traefik.http.middlewares.influxdb-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.influxdb.middlewares=influxdb-https-redirect"
+      - "traefik.http.routers.influxdb-secure.entrypoints=https"
+      - "traefik.http.routers.influxdb-secure.rule=Host(`influxdb.example.com`)"
+      - "traefik.http.routers.influxdb-secure.tls=true"
+      - "traefik.http.routers.influxdb-secure.service=influxdb"
+      - "traefik.http.services.influxdb.loadbalancer.server.port=8086"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true

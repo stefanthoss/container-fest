@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  smokeping:
+    image: lscr.io/linuxserver/smokeping:latest
+    restart: unless-stopped
+    container_name: smokeping
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.smokeping.entrypoints=http"
+      - "traefik.http.routers.smokeping.rule=Host(`smokeping.example.com`)"
+      - "traefik.http.middlewares.smokeping-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.smokeping.middlewares=smokeping-https-redirect"
+      - "traefik.http.routers.smokeping-secure.entrypoints=https"
+      - "traefik.http.routers.smokeping-secure.rule=Host(`smokeping.example.com`)"
+      - "traefik.http.routers.smokeping-secure.tls=true"
+      - "traefik.http.routers.smokeping-secure.service=smokeping"
+      - "traefik.http.services.smokeping.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true

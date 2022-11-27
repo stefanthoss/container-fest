@@ -2,16 +2,53 @@ version: "3"
 
 services:
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:8.4.3
     container_name: grafana
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     volumes:
       - ./grafana-storage:/var/lib/grafana
-      - ../docker-swag/config/etc:/le-ssl:ro
-    # https://grafana.com/docs/grafana/latest/administration/configuration/#configure-with-environment-variables
-    environment:
-      - GF_SERVER_PROTOCOL=https
-      - GF_SERVER_CERT_FILE=/le-ssl/letsencrypt/live/docker.example.com/cert.pem
-      - GF_SERVER_CERT_KEY=/le-ssl/letsencrypt/live/docker.example.com/privkey.pem
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.entrypoints=http"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.example.com`)"
+      - "traefik.http.middlewares.grafana-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.grafana.middlewares=grafana-https-redirect"
+      - "traefik.http.routers.grafana-secure.entrypoints=https"
+      - "traefik.http.routers.grafana-secure.rule=Host(`grafana.example.com`)"
+      - "traefik.http.routers.grafana-secure.tls=true"
+      - "traefik.http.routers.grafana-secure.service=grafana"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+
+  loki:
+    image: grafana/loki:2.4.2
+    volumes:
+      - ./loki-config:/etc/loki
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+    command: "-config.file=/etc/loki/local-config.yaml"
+    depends_on:
+      - grafana
+    networks:
+      - proxy
+
+  promtail:
+    image: grafana/promtail:2.4.2
+    volumes:
+      - /var/log:/var/log:ro
+      - ./promtail-config:/etc/promtail
+    ports:
+      - "1514:1514"
+    restart: unless-stopped
+    command: "-config.file=/etc/promtail/config.yaml"
+    depends_on:
+      - grafana
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

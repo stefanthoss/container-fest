@@ -1,0 +1,100 @@
+version: "3.4"
+
+services:
+  broker:
+    image: redis:6.0
+    restart: unless-stopped
+    volumes:
+      - ./redisdata:/data
+    networks:
+      - app_net
+
+  db:
+    image: postgres:13
+    restart: unless-stopped
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+    networks:
+      - app_net
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - documents:/mnt/documents
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_TIME_ZONE: America/Los_Angeles
+      PAPERLESS_OCR_LANGUAGE: eng
+      PAPERLESS_SECRET_KEY: my-secret-key
+      PAPERLESS_CONSUMER_POLLING: 30
+      USERMAP_UID: 1000
+      PAPERLESS_DATA_DIR: /mnt/documents/paperless/data
+      PAPERLESS_MEDIA_ROOT: /mnt/documents/paperless/media
+      PAPERLESS_CONSUMPTION_DIR: /mnt/documents/paperless/consume
+      PAPERLESS_TRASH_DIR: /mnt/documents/paperless/trash
+      PAPERLESS_URL: https://paperless.example.com
+    networks:
+      - proxy
+      - app_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless.entrypoints=http"
+      - "traefik.http.routers.paperless.rule=Host(`paperless.example.com`)"
+      - "traefik.http.middlewares.paperless-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.paperless.middlewares=paperless-https-redirect"
+      - "traefik.http.routers.paperless-secure.entrypoints=https"
+      - "traefik.http.routers.paperless-secure.rule=Host(`paperless.example.com`)"
+      - "traefik.http.routers.paperless-secure.tls=true"
+      - "traefik.http.routers.paperless-secure.service=paperless"
+      - "traefik.http.services.paperless.loadbalancer.server.port=8000"
+      - "traefik.docker.network=proxy"
+
+  gotenberg:
+    image: gotenberg/gotenberg:7
+    restart: unless-stopped
+    command:
+      - "gotenberg"
+      - "--chromium-disable-routes=true"
+    networks:
+      - app_net
+
+  tika:
+    image: apache/tika
+    restart: unless-stopped
+    networks:
+      - app_net
+
+volumes:
+  documents:
+    driver_opts:
+      type: "cifs"
+      device: "//192.168.1.8/documents"
+      o: "addr=192.168.1.8,rw,uid=1000,username=my-username,password=my-password,file_mode=0770,dir_mode=0770"
+
+networks:
+  proxy:
+    external: true
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.10.0/24"

@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  air-quality-bridge:
+    image: ghcr.io/stefanthoss/air-quality-bridge:latest
+    container_name: air-quality-bridge
+    restart: unless-stopped
+    stop_signal: SIGINT
+    ports:
+      - "5000:5000"
+    environment:
+      - ENABLE_INFLUXDB=true
+      - INFLUXDB_V2_URL=https://influxdb.example.com
+      - INFLUXDB_V2_TOKEN=my-token
+      - INFLUXDB_V2_ORG=my-org
+      - INFLUXDB_BUCKET=sensors
+      - INFLUXDB_MEASUREMENT=air_quality
+      - ENABLE_MQTT=true
+      - MQTT_BROKER_URL=haos.example.com
+      - MQTT_BROKER_PORT=1883
+      - MQTT_USERNAME=air-quality
+      - MQTT_PASSWORD=my-password
+      - FLASK_DEBUG=0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/info"]
+    network_mode: "bridge"

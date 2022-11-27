@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  frigate:
+    container_name: frigate
+    restart: unless-stopped
+    image: blakeblackshear/frigate:stable-amd64
+    shm_size: "64mb"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config.yml:/config/config.yml:ro
+      - ./data:/data
+      - storage:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "1935:1935" # RTMP feeds
+    environment:
+      FRIGATE_RTSP_PASSWORD: "my-password"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frigate.entrypoints=http"
+      - "traefik.http.routers.frigate.rule=Host(`frigate.example.com`)"
+      - "traefik.http.middlewares.frigate-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.frigate.middlewares=frigate-https-redirect"
+      - "traefik.http.routers.frigate-secure.entrypoints=https"
+      - "traefik.http.routers.frigate-secure.rule=Host(`frigate.example.com`)"
+      - "traefik.http.routers.frigate-secure.tls=true"
+      - "traefik.http.routers.frigate-secure.service=frigate"
+      - "traefik.http.services.frigate.loadbalancer.server.port=5000"
+      - "traefik.docker.network=proxy"
+
+volumes:
+  storage:
+    driver_opts:
+      type: "cifs"
+      device: "//192.168.1.8/nvr"
+      o: "addr=192.168.1.8,rw,uid=1000,username=my-username,password=my-password,file_mode=0770,dir_mode=0770"
+
+networks:
+  proxy:
+    external: true
