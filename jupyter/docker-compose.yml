@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  jupyter:
+    image: jupyter/datascience-notebook:latest
+    container_name: jupyter
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./jovyan-work:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PASSWORD=jupyter
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.11.0/24"

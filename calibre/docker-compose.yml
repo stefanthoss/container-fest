@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+    volumes:
+      - ./config:/config
+      - ./library:/books
+      - ./import:/import
+    ports:
+      - "8082:8080"
+      - "8081:8081"
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre-server.entrypoints=http"
+      - "traefik.http.routers.calibre-server.rule=Host(`calibre-server.example.com`)"
+      - "traefik.http.middlewares.calibre-server-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.calibre-server.middlewares=calibre-server-https-redirect"
+      - "traefik.http.routers.calibre-server-secure.entrypoints=https"
+      - "traefik.http.routers.calibre-server-secure.rule=Host(`calibre-server.example.com`)"
+      - "traefik.http.routers.calibre-server-secure.tls=true"
+      - "traefik.http.routers.calibre-server-secure.service=calibre-server"
+      - "traefik.http.services.calibre-server.loadbalancer.server.port=8081"
+      - "traefik.http.routers.calibre.entrypoints=http"
+      - "traefik.http.routers.calibre.rule=Host(`calibre.example.com`)"
+      - "traefik.http.middlewares.calibre-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.calibre.middlewares=calibre-https-redirect"
+      - "traefik.http.routers.calibre-secure.entrypoints=https"
+      - "traefik.http.routers.calibre-secure.rule=Host(`calibre.example.com`)"
+      - "traefik.http.routers.calibre-secure.tls=true"
+      - "traefik.http.routers.calibre-secure.service=calibre"
+      - "traefik.http.services.calibre.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+
+  calibre-web:
+    image: ghcr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    restart: unless-stopped
+    volumes:
+      - ./web-config:/config
+      - ./library:/books
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - DOCKER_MODS=linuxserver/calibre-web:calibre
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre-web.entrypoints=http"
+      - "traefik.http.routers.calibre-web.rule=Host(`calibre-web.example.com`)"
+      - "traefik.http.middlewares.calibre-web-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.calibre-web.middlewares=calibre-web-https-redirect"
+      - "traefik.http.routers.calibre-web-secure.entrypoints=https"
+      - "traefik.http.routers.calibre-web-secure.rule=Host(`calibre-web.example.com`)"
+      - "traefik.http.routers.calibre-web-secure.tls=true"
+      - "traefik.http.routers.calibre-web-secure.service=calibre-web"
+      - "traefik.http.services.calibre-web.loadbalancer.server.port=8083"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true

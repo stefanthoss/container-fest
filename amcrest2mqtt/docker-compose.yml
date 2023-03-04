@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  amcrest2mqtt:
+    container_name: amcrest2mqtt
+    restart: unless-stopped
+    image: dchesterton/amcrest2mqtt:1.0.16
+    environment:
+      AMCREST_HOST: "door-bell-ip"
+      AMCREST_PASSWORD: "amcrest-password"
+      MQTT_HOST: "mqtt-server-ip"
+      MQTT_USERNAME: "amcrest2mqtt"
+      MQTT_PASSWORD: "mqtt-password"
+      HOME_ASSISTANT: "true"
+      STORAGE_POLL_INTERVAL: 0

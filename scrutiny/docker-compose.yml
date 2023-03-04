@@ -2,14 +2,30 @@ version: "3"
 
 services:
   scrutiny:
-    image: analogj/scrutiny:web
+    image: ghcr.io/analogj/scrutiny:master-web
     container_name: scrutiny-web
     restart: unless-stopped
-    ports:
-      - "8080:8080"
     healthcheck:
       test: "curl -f -s http://localhost:8080/web/dashboard"
     volumes:
-      - ./config:/scrutiny/config
+      - ./config:/opt/scrutiny/config
     environment:
       - GIN_MODE=release
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.scrutiny.entrypoints=http"
+      - "traefik.http.routers.scrutiny.rule=Host(`scrutiny.example.com`)"
+      - "traefik.http.middlewares.scrutiny-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.scrutiny.middlewares=scrutiny-https-redirect"
+      - "traefik.http.routers.scrutiny-secure.entrypoints=https"
+      - "traefik.http.routers.scrutiny-secure.rule=Host(`scrutiny.example.com`)"
+      - "traefik.http.routers.scrutiny-secure.tls=true"
+      - "traefik.http.routers.scrutiny-secure.service=scrutiny"
+      - "traefik.http.services.scrutiny.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true
