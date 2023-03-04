@@ -6,6 +6,8 @@ A collection of docker-compose files I'm using in my homelab.
 
 I use Traefik to route incoming traffic. It will request SSL certificates via ACME from Let's Encrypt and use those locally. The `traefik` labels on each container configures the routing.
 
+All containers can be updated by executing `bash ./update-all.sh` in the Container Fest root directory. This script pulls the latest Docker images, restarts the containers, and removes unused Docker images from the host system to save space.
+
 ## Air Quality Bridge
 
 Forwards data from an air quality sensor to Home Assistant via MQTT. See https://github.com/stefanthoss/air-quality-bridge.
