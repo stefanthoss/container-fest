@@ -1,91 +1,96 @@
 # Container Fest
 
-A collection of docker-compose files I'm using in my homelab. The Docker host is available on my local network via `docker.example.com`.
+A collection of docker-compose files I'm using in my homelab.
+
+`docker.example.com` and all other subdomains used (e.g. `grafana.example.com` or `traefik.example.com`) should resolve to the Docker host machine. You can configure your local DNS server to resolve `*.example.com` to the host's IP.
+
+I use Traefik to route incoming traffic. It will request SSL certificates via ACME from Let's Encrypt and use those locally. The `traefik` labels on each container configures the routing.
+
+## Air Quality Bridge
+
+Forwards data from an air quality sensor to Home Assistant via MQTT. See https://github.com/stefanthoss/air-quality-bridge.
+
+## amcrest2mqtt
+
+Forwards data from an Amcrest doorbell to Home Assistant via MQTT. See https://github.com/dchesterton/amcrest2mqtt.
 
 ## Archivebox
 
-URL: <http://docker.example.com:8000/>
+URL: <http://docker.example.com:8000>
 
 A website archiving service. Change the environment variable `SEARCH_BACKEND_PASSWORD` (for both the `archivebox` and the `sonic` service) to a random password.
 
-## Collabora
+## Calibre
 
-URL: <https://docker.example.com:9980/>
+URL: <https://calibre.example.com> and <https://calibre-web.example.com>
 
-Admin URL: <https://docker.example.com:9980/loleaflet/dist/admin/admin.html>
+E-book server. This deployment contains both the linuxserver.io Calibre container and the Calibre Web interface.
 
-An online office suite that can be [integrated with Nextcloud](https://nextcloud.com/collaboraonline/). Change the `domain` environment variable to point to your Nextcloud instance (use double backslashs before the dots). Change `dictionaries` to the list of languages you want to support (two letter language and country codes). `username` and `password` are used to protect the admin console.
+## Dashy
 
-## Docker Swag
+URL: <https://dashy.example.com>
 
-An Nginx reverse proxy that is used to generate and renew SSL certificates via Let's Encrypt. Change the environment variables `SUBDOMAINS` and `URL`. Check out the [documentation](https://github.com/linuxserver/docker-swag) for details on how to configure the Certbot validation method. The file in this repo uses DNS validation via Cloudflare. Change the environment variable `TZ` to your local timezone.
+Dashboarding app for all my self-hosted services. See https://dashy.to/docs/quick-start/ for a quick-start guide.
 
-The SSL certificates for `docker.example.com` get written to `docker-swag/config/etc/letsencrypt/live/docker.example.com/` and can be used by other containers:
+## Frigate
 
-```
-docker-swag/config/etc/letsencrypt/live/docker.example.com/
-├── cert.pem -> ../../archive/docker.example.com/cert1.pem
-├── chain.pem -> ../../archive/docker.example.com/chain1.pem
-├── fullchain.pem -> ../../archive/docker.example.com/fullchain1.pem
-├── priv-fullchain-bundle.pem
-├── privkey.pem -> ../../archive/docker.example.com/privkey1.pem
-├── privkey.pfx
-└── README
-```
+URL: <https://frigate.example.com>
 
-## Grafana
+An NVR with AI object detection. Needs a `config.yml` file as described on https://docs.frigate.video/configuration/index.
 
-URL: <https://docker.example.com:3000/>
+## Grafana / Loki / Promtail
 
-A monitoring and visualization platform.
+URL: <https://grafana.example.com>
 
-## Heimdall
-
-URL: <https://docker.example.com/>
-
-A dashboard for self-hosted apps. Change the environment variable `TZ` to your local timezone.
-
-## Home Assistant
-
-URL: <http://docker.example.com:8123/>
-
-A home automation system. Change the environment variable `TZ` to your local timezone.
+A monitoring and visualization platform, including log aggregation.
 
 ## InfluxDB
 
-URL: <https://docker.example.com:8086/>
+URL: <https://influxdb.example.com>
 
 A time series database to store metrics and sensor data. The data can be visualized with Grafana.
 
 ## Jellyfin
 
-URL: <http://docker.example.com:8096/>
+URL: <https://jellyfin.example.com>
 
-A media server for music and videos. This service mounts two NFS shares to `/mnt/music` and `/mnt/videos`. Change the `volumes` section according to your own NFS shares.
+A media server for music and videos. This container mounts the read-only Samba share `//192.168.1.8/videos` for the video files.
+
+## Jupyter
+
+URL: <https://docker.example.com:8888>
+
+Jupyter notebook server with a data science environment.
 
 ## LibreSpeed
 
-URL: <http://docker.example.com:8010/>
+URL: <http://docker.example.com:8010>
 
 A self-hosted speedtest website for your local network.
 
-## Netdata
+## Paperless
 
-URL: <http://docker.example.com:19999/>
+URL: <https://paperless.example.com:>
 
-A tool for monitoring real-time system metrics. Change `VIRTUALIZATION=kvm` to the virtualization technology of your Docker host (I'm using `kvm` because I'm virtualizing with Proxmox).
+A document management system. This container mounts the Samba share `//192.168.1.8/documents` for storing documents.
 
 ## Portainer
 
-URL: <https://docker.example.com:9000/>
+URL: <https://portainer.example.com>
 
 A Docker management UI, useful for debugging and monitoring.
 
 ## Scrutiny
 
-URL: <http://docker.example.com:8080/>
+URL: <https://scrutiny.example.com>
 
-A web UI for SMART monitoring of hard drives and SSDs. Needs a collector agent to collect the SMART data.
+A web UI for SMART monitoring of hard drives and SSDs. Needs a collector agent to collect the SMART data. See <https://blog.stefandroid.com/2022/01/14/smart-scrutiny.html> for a detailed description.
+
+## SmokePing
+
+URL: <https://smokeping.example.com>
+
+A latency measurement tool. See https://oss.oetiker.ch/smokeping/doc/smokeping_config.en.html for the configuration documentation.
 
 ## Sonos Samba
 
@@ -93,6 +98,14 @@ A Samba server that mounts a NFS share and exposes it read-only via the SMBv1 pr
 
 ## Tautulli
 
-URL: <http://docker.example.com:8181/>
+URL: <https://tautulli.example.com>
 
 A web application for monitoring, collecting statistics, and analyzing usage of a Plex Media Server.
+
+## Traefik
+
+URL: <https://traefik.example.com>
+
+A reverse proxy that is used to generate and renew SSL certificates via Let's Encrypt and forward traffic to the appropriate containers. See https://doc.traefik.io/traefik/https/acme/ for how to configure the SSL certificates (you should use a DNS challenge for the internal hostnames).
+
+Set `traefik.http.middlewares.traefik-auth.basicauth.users` based on the instructions at https://doc.traefik.io/traefik/middlewares/http/basicauth/.
